@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strona - 99close</title>
+    <title>SOCIALS ALL 99CLOSE MEMBERS</title>
+    <link rel="icon" type="image/jpeg" href="content/99closewebicon.jpeg">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -140,6 +141,29 @@
                     src="https://github.githubassets.com/images/icons/emoji/unicode/2764.png"></g-emoji> by <a
                 href="https://www.instagram.com/kawoshii_99c/">Kawoshii</a>
         </p>
+        <script>
+            (function () {
+                const originalTitle = document.title;
+                let flashInterval = null;
+                let showMessage = true;
+
+                document.addEventListener("visibilitychange", function () {
+                    if (document.hidden) {
+                        flashInterval = setInterval(function () {
+                            document.title = showMessage
+                                ? "\u2757\uFE0F WRÓĆ I OBCZAJ ZAWODNIKÓW Z 99CLOSE \u2757\uFE0F"
+                                : originalTitle;
+                            showMessage = !showMessage;
+                        }, 800);
+                    } else {
+                        clearInterval(flashInterval);
+                        flashInterval = null;
+                        showMessage = true;
+                        document.title = originalTitle;
+                    }
+                });
+            })();
+        </script>
     </body>
 </main>
 

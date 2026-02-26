@@ -20,8 +20,10 @@
 
 body {
     font-family: 'Berry Rotunda', sans-serif;
-    overflow-y: hidden;
+    overflow-y: auto;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 .background {
@@ -62,19 +64,22 @@ body {
 
 .container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 100px;
-    height: 100vh;
+    min-height: 100vh;
     margin-bottom: 50px;
     transform: translateY(-80px);
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .kacper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 700px;
+    min-height: 700px;
     width: 450px;
     border-radius: 3px;
     border: 2px solid rgba(30, 30, 30, 0.9);
@@ -83,6 +88,8 @@ body {
     -webkit-backdrop-filter: blur(10px);
     position: relative;
     padding-top: 200px;
+    padding-bottom: 30px;
+    box-sizing: border-box;
 }
 
 .kacper>img {
@@ -103,7 +110,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 700px;
+    min-height: 700px;
     width: 450px;
     border-radius: 3px;
     border: 2px solid rgba(30, 30, 30, 0.9);
@@ -112,6 +119,8 @@ body {
     -webkit-backdrop-filter: blur(10px);
     position: relative;
     padding-top: 200px;
+    padding-bottom: 30px;
+    box-sizing: border-box;
 }
 
 .minio>img {
@@ -132,7 +141,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 700px;
+    min-height: 700px;
     width: 450px;
     border-radius: 3px;
     border: 2px solid rgba(30, 30, 30, 0.9);
@@ -141,6 +150,8 @@ body {
     -webkit-backdrop-filter: blur(10px);
     position: relative;
     padding-top: 200px;
+    padding-bottom: 30px;
+    box-sizing: border-box;
 }
 
 .dyrt>img {
@@ -161,7 +172,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 700px;
+    min-height: 700px;
     width: 450px;
     border-radius: 3px;
     border: 2px solid rgba(30, 30, 30, 0.9);
@@ -170,6 +181,8 @@ body {
     -webkit-backdrop-filter: blur(10px);
     position: relative;
     padding-top: 200px;
+    padding-bottom: 30px;
+    box-sizing: border-box;
 }
 
 .kawoshii>img {
@@ -190,9 +203,10 @@ body {
     text-align: center;
     font-family: open sans, sans-serif;
     color: white;
-    position: absolute;
-    bottom: 0;
+    position: relative;
     width: 100%;
+    padding: 20px 0;
+    box-sizing: border-box;
 }
 
 .footer-heart a {
@@ -222,8 +236,8 @@ body {
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: 40px;
-    margin: -50px auto 0 auto;
+    gap: 25px;
+    margin: -10px auto 0 auto;
     width: 80%;
     padding: 0;
     flex: 1;
@@ -293,4 +307,141 @@ body {
     text-transform: uppercase;
     position: relative;
     z-index: 1;
+}
+
+/* ===== RESPONSIVE: Tablet (≤1200px) ===== */
+@media (max-width: 1200px) {
+    .container {
+        gap: 40px;
+    }
+
+    .kacper,
+    .minio,
+    .dyrt,
+    .kawoshii {
+        width: 340px;
+        min-height: 600px;
+    }
+}
+
+/* ===== RESPONSIVE: Small tablet / large phone (≤900px) ===== */
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        min-height: auto;
+        gap: 50px;
+        transform: none;
+        padding: 30px 20px;
+        margin-bottom: 0;
+    }
+
+    .content {
+        padding-top: 3vh;
+    }
+
+    .content h1 {
+        font-size: 1.5rem;
+    }
+
+    .kacper,
+    .minio,
+    .dyrt,
+    .kawoshii {
+        width: 85%;
+        max-width: 380px;
+        height: auto;
+        padding-top: 180px;
+        padding-bottom: 35px;
+    }
+
+    .kacper>img,
+    .minio>img,
+    .dyrt>img,
+    .kawoshii>img {
+        width: 100px;
+        top: 45px;
+    }
+
+    .white {
+        font-size: 24px;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+
+    .social-container {
+        gap: 24px;
+        margin-top: -15px;
+        width: 75%;
+    }
+
+    .social-link {
+        padding: 16px 22px;
+    }
+
+    .social-link span {
+        font-size: 18px;
+    }
+}
+
+/* ===== RESPONSIVE: Small phone (≤480px) ===== */
+@media (max-width: 480px) {
+    .content h1 {
+        font-size: 1.2rem;
+        padding: 0 10px;
+    }
+
+    .container {
+        gap: 40px;
+        padding: 20px 15px;
+    }
+
+    .kacper,
+    .minio,
+    .dyrt,
+    .kawoshii {
+        width: 90%;
+        padding-top: 150px;
+        padding-bottom: 30px;
+    }
+
+    .kacper>img,
+    .minio>img,
+    .dyrt>img,
+    .kawoshii>img {
+        width: 80px;
+        top: 40px;
+    }
+
+    .white {
+        font-size: 20px;
+        margin-top: 12px;
+        margin-bottom: 18px;
+    }
+
+    .social-container {
+        gap: 18px;
+        margin-top: -10px;
+        width: 82%;
+    }
+
+    .social-link {
+        padding: 14px 18px;
+        gap: 10px;
+    }
+
+    .social-link span {
+        font-size: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    .social-logo {
+        width: 24px;
+        height: 24px;
+    }
+
+    .footer-heart {
+        font-size: 13px;
+        padding: 15px 10px;
+    }
 }
