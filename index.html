@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
 </head>
 <main>
 
@@ -132,6 +133,12 @@
             </div>
         </div>
 
+        <div class="discord-section">
+            <iframe src="https://discord.com/widget?id=1247838913993904199&theme=dark" width="350" height="500"
+                allowtransparency="true" frameborder="0"
+                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+        </div>
+
         <p class="footer-heart">
             <a href="https://discord.gg/ERt8m3EKFy" target="_blank">Discord</a> <span
                 style="color: white; margin: 0 10px;">&#9679;</span>
@@ -141,6 +148,349 @@
                     src="https://github.githubassets.com/images/icons/emoji/unicode/2764.png"></g-emoji> by <a
                 href="https://www.instagram.com/kawoshii_99c/">Kawoshii</a>
         </p>
+
+        <div class="music-wrapper" id="musicWrapper">
+            <div class="music-trigger" id="musicTrigger">
+                <img src="content/arrow.png" alt="Music">
+            </div>
+            <div class="music-panel" id="musicPanel">
+                <div class="music-title" id="musicTitle">Loading...</div>
+                <div class="music-progress-container">
+                    <div class="music-progress-bar" id="musicProgressBar">
+                        <div class="music-progress-fill" id="musicProgressFill"></div>
+                    </div>
+                    <div class="music-time">
+                        <span id="musicCurrentTime">0:00</span>
+                        <span id="musicDuration">0:00</span>
+                    </div>
+                </div>
+                <div class="music-controls">
+                    <button class="music-btn" id="prevBtn" title="Previous">
+                        <img src="content/previous.png" alt="Previous">
+                    </button>
+                    <button class="music-btn play-pause-btn" id="playPauseBtn" title="Play/Pause">
+                        <img src="content/play.png" alt="Play" id="playPauseIcon">
+                    </button>
+                    <button class="music-btn" id="nextBtn" title="Next">
+                        <img src="content/next.png" alt="Next">
+                    </button>
+                </div>
+                <div class="music-volume-container">
+                    <img src="content/volume" alt="Volume" id="volumeIcon">
+                    <input type="range" class="music-volume-slider" id="volumeSlider" min="0" max="100" value="50">
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                const SONGS = [
+                    'Bukiet Róż.mp3',
+                    'D.Y.R.T.mp3',
+                    'Go.mp3',
+                    'Gonia mnie.mp3',
+                    'I sorry.mp3',
+                    'Lov u.mp3',
+                    'Lubi Sex.mp3',
+                    'Nie bedziemy razem.mp3',
+                    'O co chodzi.mp3',
+                    'S__e na blat.mp3',
+                    'Up.mp3',
+                    'bandy.mp3',
+                    'daj mi tylko swoj tlen.mp3',
+                    'gada powoli.mp3',
+                    "hell'p.mp3",
+                    'hope.mp3',
+                    'killme.mp3',
+                    'last step.mp3',
+                    'no respect.mp3',
+                    'track.mp3',
+                    'trappin out.mp3',
+                    'zrobie to.mp3'
+                ];
+
+                if (SONGS.length === 0) {
+                    console.warn('Music Player: No songs in SONGS array. Add filenames to enable playback.');
+                    return;
+                }
+
+
+                const audio = new Audio();
+                const wrapper = document.getElementById('musicWrapper');
+                const playPauseBtn = document.getElementById('playPauseBtn');
+                const playPauseIcon = document.getElementById('playPauseIcon');
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const progressBar = document.getElementById('musicProgressBar');
+                const progressFill = document.getElementById('musicProgressFill');
+                const currentTimeEl = document.getElementById('musicCurrentTime');
+                const durationEl = document.getElementById('musicDuration');
+                const titleEl = document.getElementById('musicTitle');
+                const volumeSlider = document.getElementById('volumeSlider');
+
+
+                const KEY_SONG_INDEX = '99c_songIndex';
+                const KEY_TIME = '99c_songTime';
+                const KEY_PLAYING = '99c_songPlaying';
+                const KEY_VOLUME = '99c_volume';
+                const KEY_SHUFFLED = '99c_shuffled';
+
+                let currentIndex = 0;
+                let shuffledOrder = [];
+                let isPlaying = false;
+
+
+                function getShuffledOrder() {
+                    const saved = sessionStorage.getItem(KEY_SHUFFLED);
+                    if (saved) {
+                        return JSON.parse(saved);
+                    }
+
+                    const order = SONGS.map((_, i) => i);
+                    for (let i = order.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [order[i], order[j]] = [order[j], order[i]];
+                    }
+                    sessionStorage.setItem(KEY_SHUFFLED, JSON.stringify(order));
+                    return order;
+                }
+
+
+                function formatTime(s) {
+                    if (isNaN(s) || !isFinite(s)) return '0:00';
+                    const mins = Math.floor(s / 60);
+                    const secs = Math.floor(s % 60);
+                    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+                }
+
+
+                function readSongTitle(songPath) {
+                    try {
+                        jsmediatags.read(songPath, {
+                            onSuccess: function (tag) {
+                                const title = tag.tags.title;
+                                const artist = tag.tags.artist;
+                                if (title && artist) {
+                                    titleEl.textContent = artist + ' — ' + title;
+                                } else if (title) {
+                                    titleEl.textContent = title;
+                                }
+                            },
+                            onError: function () {
+
+                            }
+                        });
+                    } catch (e) {
+                        console.warn('Could not read ID3 tags, using filename fallback.', e);
+                    }
+                }
+
+
+                function getSongName(filename) {
+                    return filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+                }
+
+                let userHasInteracted = false;
+
+
+                function markInteracted() {
+                    userHasInteracted = true;
+                    ['click', 'touchstart', 'keydown', 'scroll', 'mousemove', 'wheel'].forEach(function (evt) {
+                        document.removeEventListener(evt, markInteracted);
+                    });
+                }
+                ['click', 'touchstart', 'keydown', 'scroll', 'mousemove', 'wheel'].forEach(function (evt) {
+                    document.addEventListener(evt, markInteracted, { once: true });
+                });
+
+
+                function loadSong(index, seekTime, isInit) {
+                    currentIndex = index;
+                    const songFile = SONGS[shuffledOrder[index]];
+                    const songPath = 'nuty/' + songFile;
+                    audio.src = songPath;
+
+                    titleEl.textContent = getSongName(songFile);
+                    readSongTitle(songPath);
+                    sessionStorage.setItem(KEY_SONG_INDEX, index.toString());
+
+
+                    audio.addEventListener('loadedmetadata', function onMeta() {
+                        durationEl.textContent = formatTime(audio.duration);
+                        if (seekTime !== undefined && seekTime > 0) {
+                            audio.currentTime = seekTime;
+                        }
+                    }, { once: true });
+
+                    if (isInit) {
+
+                        const wasPlaying = sessionStorage.getItem(KEY_PLAYING) === 'true';
+                        if (wasPlaying || seekTime === undefined) {
+                            initAutoplay();
+                        }
+                    } else {
+
+                        playAudio();
+                    }
+                }
+
+
+                function playAudio() {
+                    audio.muted = false;
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            isPlaying = true;
+                            playPauseIcon.src = 'content/pause.png';
+                            playPauseIcon.alt = 'Pause';
+                            sessionStorage.setItem(KEY_PLAYING, 'true');
+                        }).catch(error => {
+                            console.error("Playback failed:", error);
+                            isPlaying = false;
+                            playPauseIcon.src = 'content/play.png';
+                            playPauseIcon.alt = 'Play';
+                            sessionStorage.setItem(KEY_PLAYING, 'false');
+                        });
+                    }
+                }
+
+
+                function initAutoplay() {
+                    audio.muted = true;
+                    audio.play().then(() => {
+                        isPlaying = true;
+                        playPauseIcon.src = 'content/pause.png';
+                        playPauseIcon.alt = 'Pause';
+                        sessionStorage.setItem(KEY_PLAYING, 'true');
+
+                        function unmuteOnInteraction() {
+                            audio.muted = false;
+                            userHasInteracted = true;
+                            ['click', 'touchstart', 'keydown', 'scroll', 'mousemove', 'wheel'].forEach(function (evt) {
+                                document.removeEventListener(evt, unmuteOnInteraction);
+                            });
+                        }
+                        ['click', 'touchstart', 'keydown', 'scroll', 'mousemove', 'wheel'].forEach(function (evt) {
+                            document.addEventListener(evt, unmuteOnInteraction, { once: true });
+                        });
+                    }).catch(() => {
+
+                        isPlaying = false;
+                        playPauseIcon.src = 'content/play.png';
+                        playPauseIcon.alt = 'Play';
+                        function resumeOnInteraction() {
+                            audio.muted = false;
+                            userHasInteracted = true;
+                            audio.play().then(() => {
+                                isPlaying = true;
+                                playPauseIcon.src = 'content/pause.png';
+                                playPauseIcon.alt = 'Pause';
+                                sessionStorage.setItem(KEY_PLAYING, 'true');
+                            }).catch(() => { });
+                            ['click', 'touchstart', 'keydown', 'scroll', 'mousemove', 'wheel'].forEach(function (evt) {
+                                document.removeEventListener(evt, resumeOnInteraction);
+                            });
+                        }
+                        ['click', 'touchstart', 'keydown', 'scroll', 'mousemove', 'wheel'].forEach(function (evt) {
+                            document.addEventListener(evt, resumeOnInteraction, { once: true });
+                        });
+                    });
+                }
+
+                function pauseAudio() {
+                    audio.pause();
+                    isPlaying = false;
+                    playPauseIcon.src = 'content/play.png';
+                    playPauseIcon.alt = 'Play';
+                    sessionStorage.setItem(KEY_PLAYING, 'false');
+                }
+
+
+                playPauseBtn.addEventListener('click', function () {
+                    if (isPlaying) {
+                        pauseAudio();
+                    } else {
+                        playAudio();
+                    }
+                });
+
+
+                nextBtn.addEventListener('click', function () {
+                    sessionStorage.removeItem(KEY_TIME);
+                    const nextIndex = (currentIndex + 1) % SONGS.length;
+                    sessionStorage.setItem(KEY_PLAYING, 'true');
+                    loadSong(nextIndex, undefined, false);
+                });
+
+
+                prevBtn.addEventListener('click', function () {
+                    sessionStorage.removeItem(KEY_TIME);
+                    const prevIndex = (currentIndex - 1 + SONGS.length) % SONGS.length;
+                    sessionStorage.setItem(KEY_PLAYING, 'true');
+                    loadSong(prevIndex, undefined, false);
+                });
+
+
+                audio.addEventListener('ended', function () {
+                    sessionStorage.removeItem(KEY_TIME);
+                    const nextIndex = (currentIndex + 1) % SONGS.length;
+                    sessionStorage.setItem(KEY_PLAYING, 'true');
+                    loadSong(nextIndex, undefined, false);
+                });
+
+
+                audio.addEventListener('timeupdate', function () {
+                    if (audio.duration) {
+                        const pct = (audio.currentTime / audio.duration) * 100;
+                        progressFill.style.width = pct + '%';
+                        currentTimeEl.textContent = formatTime(audio.currentTime);
+                    }
+                });
+
+
+                progressBar.addEventListener('click', function (e) {
+                    if (audio.duration) {
+                        const rect = progressBar.getBoundingClientRect();
+                        const pct = (e.clientX - rect.left) / rect.width;
+                        audio.currentTime = pct * audio.duration;
+                    }
+                });
+
+
+                const savedVol = sessionStorage.getItem(KEY_VOLUME);
+                if (savedVol !== null) {
+                    volumeSlider.value = savedVol;
+                    audio.volume = savedVol / 100;
+                } else {
+                    audio.volume = 0.5;
+                }
+
+                volumeSlider.addEventListener('input', function () {
+                    audio.volume = this.value / 100;
+                    sessionStorage.setItem(KEY_VOLUME, this.value);
+                });
+
+
+                setInterval(function () {
+                    if (audio.currentTime > 0) {
+                        sessionStorage.setItem(KEY_TIME, audio.currentTime.toString());
+                    }
+                }, 500);
+
+
+                shuffledOrder = getShuffledOrder();
+
+                const savedIndex = sessionStorage.getItem(KEY_SONG_INDEX);
+                const savedTime = sessionStorage.getItem(KEY_TIME);
+
+                if (savedIndex !== null) {
+                    loadSong(parseInt(savedIndex, 10), savedTime ? parseFloat(savedTime) : 0, true);
+                } else {
+                    loadSong(0, undefined, true);
+                }
+            })();
+        </script>
+
         <script>
             (function () {
                 const originalTitle = document.title;
