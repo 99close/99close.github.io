@@ -523,6 +523,7 @@ body {
     width: 450px;
     min-height: 700px;
     box-sizing: border-box;
+    margin: 0 auto;
 }
 
 .discord-section iframe {
